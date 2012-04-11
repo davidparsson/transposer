@@ -3,7 +3,7 @@
 """
 transposer.py
 
-Created by David Pärsson on 2011-08-13.
+Created by David PÃ¤rsson on 2011-08-13.
 """
 
 import sys
