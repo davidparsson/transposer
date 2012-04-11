@@ -8,7 +8,7 @@ Usage
 
 To transpose chords, use transposer like this:
 
-    python transposer.py --from=F# --to=Eb input.txt
+  python transposer.py --from=F# --to=Eb input.txt
 
 Input files
 -----------
@@ -19,12 +19,12 @@ Example
 -------
 The contents `input.txt`:
 
-    Rocking start, jazzy ending
-    | D | G A | Bbm7#11/Db |
+  Rocking start, jazzy ending
+  | D | G A | Bbm7#11/Db |
 
 Using `transposer --from=D --to=E input.txt` will produce the result
 
-	Result (D -> E):
-	Rocking start, jazzy ending
-	| E | A B | Cm7#11/D# |
+  Result (D -> E):
+  Rocking start, jazzy ending
+  | E | A B | Cm7#11/D# |
 
