@@ -50,29 +50,44 @@ def get_key_from_index(index, to_key):
 	return key_names[0]
 
 def get_transponation_steps(source_key, target_key):
+	"""
+	>>> get_transponation_steps('D', 'C')
+	-2
+	"""
 	source_index = get_index_from_key(source_key)
 	target_index = get_index_from_key(target_key)
 	return target_index - source_index
-
-def transpose(source_chord, direction, to_key):
-	source_index = get_index_from_key(source_chord)
-	return get_key_from_index(source_index + direction, to_key)
 
 def transpose_file(file_name, from_key, to_key):
 	direction = get_transponation_steps(from_key, to_key)
 	result = ''
 	try:
 		for line in open(file_name):
-			if line[0] == '|':
-				result += transpose_line(line, direction, to_key)
-			else:
-				result += line
+			result += transpose_line(line, direction, to_key)
 		return result
 	except IOError:
 		print("Invalid filename!")
 		usage()
 
 def transpose_line(source_line, direction, to_key):
+	"""Transposes a line a number of keys if it starts with a pipe. Examples:
+	>>> transpose_line('| A | A# | Bb | C#m7/F# |', -2, 'C')
+	'| G | Ab | Ab | Bm7/E |'
+
+	Different keys will be sharp or flat depending on target key.
+	>>> transpose_line('| A | A# | Bb | C#m7/F# |', -2, 'D')
+	'| G | G# | G# | Bm7/E |'
+
+	It will use the more common key if sharp/flat, for example F# instead of Gb.
+	>>> transpose_line('| Gb |', 0, 'Gb')
+	'| F# |'
+
+	Lines not starting with pipe will not be transposed
+	>>> transpose_line('A | Bb |', -2, 'C')
+	'A | Bb |'
+	"""
+	if source_line[0] != '|':
+		return source_line
 	source_chords = key_regex.findall(source_line)
 	return recursive_line_transpose(source_line, source_chords, direction, to_key)
 	
@@ -88,6 +103,11 @@ def recursive_line_transpose(source_line, source_chords, direction, to_key):
 		   recursive_line_transpose(source_line[after_chord_index:], source_chords, direction, to_key)
 
 
+def transpose(source_chord, direction, to_key):
+	source_index = get_index_from_key(source_chord)
+	return get_key_from_index(source_index + direction, to_key)
+
+
 def usage():
 	print 'Usage:'
 	print '%s --from=Eb --to=F# input_filename' % os.path.basename(__file__)
@@ -98,16 +118,20 @@ def main():
 	to_key = 'C'
 	file_name = None
 	try:
-		options, arguments = getopt.getopt(sys.argv[1:], 'f:t:', ['from=', 'to='])
+		options, arguments = getopt.getopt(sys.argv[1:], 'f:t:', ['from=', 'to=', 'doctest'])
 	except getopt.GetoptError, err:
 		print str(err)
-		#usage()
+		usage()
 		sys.exit(2)
 	for option, value in options:
 		if option in ('-f', '--from'):
 			from_key = value
 		elif option in ('-t', '--to'):
 			to_key = value
+		elif option == '--doctest':
+			import doctest
+			doctest.testmod()
+			exit()
 		else:
 			usage()
 	
@@ -121,13 +145,5 @@ def main():
 	print("Result (%s -> %s):" % (from_key, to_key))
 	print(result)
 	
-#	verify(get_transponation_steps('D', 'C') == -2)
-	
-#	print "All is OK!"
-
-def verify(expression):
-	if not expression:
-		raise Exception("Test verification failed")
-
 if __name__ == '__main__':
 	main()
