@@ -19,12 +19,16 @@ Example
 -------
 The contents `input.txt`:
 
-  Rocking start, jazzy ending
-  | D | G A | Bbm7#11/Db |
+<pre>
+Rocking start, jazzy ending
+| D | G A | Bbm7#11/Db |
+</pre
 
 Using `transposer --from=D --to=E input.txt` will produce the result
 
-  Result (D -> E):
-  Rocking start, jazzy ending
-  | E | A B | Cm7#11/D# |
+<pre>
+Result (D -> E):
+Rocking start, jazzy ending
+| E | A B | Cm7#11/D# |
+</pre>
 
