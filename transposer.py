@@ -71,6 +71,10 @@ def get_transponation_steps(source_key, target_key):
 	return target_index - source_index
 
 def transpose_file(file_name, from_key, to_key):
+	"""Transposes a file from a key to another.
+	>>> transpose_file('example.txt', 'D', 'E')
+	'Rocking start, jazzy ending\\n| E | A B | Cm7#11/D# |\\n'
+	"""
 	direction = get_transponation_steps(from_key, to_key)
 	result = ''
 	try:
