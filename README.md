@@ -17,14 +17,14 @@ The input file should be a plain text file, but can contain any text - only line
 
 Example
 -------
-The contents `input.txt`:
+The contents of `example.txt`:
 
 <pre>
 Rocking start, jazzy ending
 | D | G A | Bbm7#11/Db |
 </pre>
 
-Using `transposer --from=D --to=E input.txt` will produce the result
+Using `transposer --from=D --to=E example.txt` will produce the result
 
 <pre>
 Result (D -> E):
