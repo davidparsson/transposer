@@ -22,7 +22,7 @@ The contents `input.txt`:
 <pre>
 Rocking start, jazzy ending
 | D | G A | Bbm7#11/Db |
-</pre
+</pre>
 
 Using `transposer --from=D --to=E input.txt` will produce the result
 
