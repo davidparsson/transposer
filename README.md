@@ -8,7 +8,7 @@ Usage
 
 To transpose chords, use transposer like this:
 
-  python transposer.py --from=F# --to=Eb input.txt
+`python transposer.py --from=F# --to=Eb input.txt`
 
 Input files
 -----------
