@@ -1,4 +1,4 @@
-Transposer
+Transposer [![Build Status](https://travis-ci.org/davidparsson/transposer.svg?branch=master)](https://travis-ci.org/davidparsson/transposer)
 ==========
 
 Transposing chords from one key to another
