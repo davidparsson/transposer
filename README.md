@@ -1,5 +1,7 @@
-Transposer [![Build Status](https://travis-ci.org/davidparsson/transposer.svg?branch=master)](https://travis-ci.org/davidparsson/transposer)
+Transposer 
 ==========
+
+[![Build Status](https://github.com/davidparsson/transposer/workflows/CI/badge.svg)](https://github.com/davidparsson/transposer/actions?query=workflow%3ACI)
 
 Transposing chords from one key to another
 
