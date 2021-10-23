@@ -130,8 +130,8 @@ def transpose(source_chord, direction, to_key):
 
 
 def usage():
-	print 'Usage:'
-	print '%s --from=Eb --to=F# input_filename' % os.path.basename(__file__)
+	print('Usage:')
+	print('%s --from=Eb --to=F# input_filename' % os.path.basename(__file__))
 	sys.exit(2)
 
 def main():
@@ -140,9 +140,7 @@ def main():
 	file_name = None
 	try:
 		options, arguments = getopt.getopt(sys.argv[1:], 'f:t:', ['from=', 'to=', 'doctest'])
-	except getopt.GetoptError, err:
-		print str(err)
-		usage()
+	except getopt.GetoptError:
 		sys.exit(2)
 	for option, value in options:
 		if option in ('-f', '--from'):
