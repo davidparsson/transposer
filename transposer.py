@@ -37,20 +37,20 @@ sharp_flat_preferences = {
 	'Ab': 'b',
 	}
 abc_to_doremi_dictionary = {
-	'A' : 'La',
-	'B' : 'Si',
-	'C' : 'Do',
-	'D' : 'Re',
-	'E' : 'Mi',
-	'F' : 'Fa',
-	'G' : 'Sol',
+	'A' : 'LA',
+	'B' : 'SI',
+	'C' : 'DO',
+	'D' : 'RE',
+	'E' : 'MI',
+	'F' : 'FA',
+	'G' : 'SOL',
 	}
 doremi_to_abc_dictionary = { 
 	abc_to_doremi_dictionary[chord]: chord for chord in abc_to_doremi_dictionary
 	}
 
 key_regex_abc = re.compile(r"[ABCDEFG][#b]?")
-key_regex_doremi = re.compile(r"(?:Do|Re|Mi|Fa|Sol|La|Si|Do)[#b]?")
+key_regex_doremi = re.compile(r"(?:DO|RE|MI|FA|SOL|LA|SI|DO)[#b]?")
 
 def get_index_from_key(source_key):
 	"""Gets the internal index of a key
@@ -128,6 +128,10 @@ def transpose_line(source_line, direction, to_key, chord_style_in='abc', chord_s
 	return recursive_line_transpose(source_line, source_chords, direction, to_key, chord_style_out)
 	
 def chord_doremi_to_abc(x):
+	"""Converts a chord from DO-RE-MI to A-B-C notation.
+	>>> chord_doremi_to_abc('MIb')
+	'Eb'
+	"""
 	sharp_flat = re.findall(r'[b\#]', x)
 	clean_chord = re.sub(r'[b\#]','', x)
 	translated_chord = doremi_to_abc_dictionary[clean_chord]
@@ -161,6 +165,10 @@ def transpose(source_chord, direction, to_key, chord_style_out='abc'):
 	raise Exception("Invalid output chord style: %s" % chord_style_out)
 
 def chord_abc_to_doremi(x):
+	"""Converts a chord from A-B-C to DO-RE-MI notation.
+	>>> chord_abc_to_doremi('Eb')
+	'MIb'
+	"""
 	sharp_flat = re.findall(r'[b\#]', x)
 	clean_chord = re.sub(r'[b\#]','', x)
 	translated_chord = abc_to_doremi_dictionary[clean_chord]
@@ -169,10 +177,26 @@ def chord_abc_to_doremi(x):
 	return translated_chord
 
 def is_abc(chord):
-	return chord in abc_to_doremi_dictionary
+	"""Returns True if a chord is in the A-B-C notation.
+	False is returned otherwise.
+	>>> is_abc('Eb')
+	True
+
+	>>> is_abc('FA')
+	False
+	"""
+	return re.sub(r'[b\#]', '', chord) in abc_to_doremi_dictionary
 
 def is_doremi(chord):
-	return chord in doremi_to_abc_dictionary
+	"""Returns True if a chord is in the DO-RE-MI notation.
+	False is returned otherwise.
+	>>> is_doremi('Eb')
+	False
+
+	>>> is_doremi('FA')
+	True
+	"""
+	return re.sub(r'[b\#]', '', chord) in doremi_to_abc_dictionary
 
 
 def usage():

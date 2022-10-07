@@ -3,7 +3,7 @@ Transposer
 
 [![Build Status](https://github.com/bfrangi/transposer/workflows/CI/badge.svg)](https://github.com/bfrangi/transposer/actions?query=workflow%3ACI)
 
-Transposing chords from one key to another and changing between Do-Re-Mi and A-B-C notations.
+Transposing chords from one key to another and changing between DO-RE-MI and A-B-C notations.
 
 Usage
 -----
@@ -15,11 +15,11 @@ To transpose chords, use transposer like this:
 Optional Parameters
 ----
 
-You can also use the parameters `--style-in` and `--style-out` in order to choose Do-Re-Mi or A-B-C systems for the input and output.
+You can also use the parameters `--style-in` and `--style-out` in order to choose DO-RE-MI or A-B-C systems for the input and output.
 
-For example, the following would take a sequence of chords in the Do-Re-Mi system and convert them to the A-B-C system without transposing:
+For example, the following would take a sequence of chords in the DO-RE-MI system and convert them to the A-B-C system without transposing:
 
-    python transposer.py --from=D --to=Re --style-in=doremi --style-out=abc input.txt
+    python transposer.py --from=D --to=RE --style-in=doremi --style-out=abc input.txt
 
 `--from` and `--to` parameters can always be given in either system.
 
