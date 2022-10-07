@@ -36,8 +36,21 @@ sharp_flat_preferences = {
 	'G#': 'b',
 	'Ab': 'b',
 	}
+abc_to_doremi_dictionary = {
+	'A' : 'La',
+	'B' : 'Si',
+	'C' : 'Do',
+	'D' : 'Re',
+	'E' : 'Mi',
+	'F' : 'Fa',
+	'G' : 'Sol',
+	}
+doremi_to_abc_dictionary = { 
+	abc_to_doremi_dictionary[chord]: chord for chord in abc_to_doremi_dictionary
+	}
 
-key_regex = re.compile(r"[ABCDEFG][#b]?")
+key_regex_abc = re.compile(r"[ABCDEFG][#b]?")
+key_regex_doremi = re.compile(r"(?:Do|Re|Mi|Fa|Sol|La|Si|Do)[#b]?")
 
 def get_index_from_key(source_key):
 	"""Gets the internal index of a key
@@ -70,7 +83,7 @@ def get_transponation_steps(source_key, target_key):
 	target_index = get_index_from_key(target_key)
 	return target_index - source_index
 
-def transpose_file(file_name, from_key, to_key):
+def transpose_file(file_name, from_key, to_key, chord_style_in='abc', chord_style_out='abc'):
 	"""Transposes a file from a key to another.
 	>>> transpose_file('example.txt', 'D', 'E')
 	'Rocking start, jazzy ending\\n| E | A B | Cm7#11/D# |\\n'
@@ -79,13 +92,13 @@ def transpose_file(file_name, from_key, to_key):
 	result = ''
 	try:
 		for line in open(file_name):
-			result += transpose_line(line, direction, to_key)
+			result += transpose_line(line, direction, to_key, chord_style_in, chord_style_out)
 		return result
 	except IOError:
 		print("Invalid filename!")
 		usage()
 
-def transpose_line(source_line, direction, to_key):
+def transpose_line(source_line, direction, to_key, chord_style_in='abc', chord_style_out='abc'):
 	"""Transposes a line a number of keys if it starts with a pipe. Examples:
 	>>> transpose_line('| A | A# | Bb | C#m7/F# |', -2, 'C')
 	'| G | Ab | Ab | Bm7/E |'
@@ -104,51 +117,93 @@ def transpose_line(source_line, direction, to_key):
 	"""
 	if source_line[0] != '|':
 		return source_line
-	source_chords = key_regex.findall(source_line)
-	return recursive_line_transpose(source_line, source_chords, direction, to_key)
+	if chord_style_in == 'abc':
+		source_chords = key_regex_abc.findall(source_line)
+	elif chord_style_in == 'doremi':
+		source_chords = key_regex_doremi.findall(source_line)
+		source_chords = [chord_doremi_to_abc(chord) for chord in source_chords]
+		source_line = key_regex_doremi.sub(lambda x: chord_doremi_to_abc(x.group()),source_line)
+	else:
+		raise Exception("Invalid input chord style: %s" % chord_style_in)
+	return recursive_line_transpose(source_line, source_chords, direction, to_key, chord_style_out)
 	
-def recursive_line_transpose(source_line, source_chords, direction, to_key):
+def chord_doremi_to_abc(x):
+	sharp_flat = re.findall(r'[b\#]', x)
+	clean_chord = re.sub(r'[b\#]','', x)
+	translated_chord = doremi_to_abc_dictionary[clean_chord]
+	for sf in sharp_flat:
+		translated_chord += sf
+	return translated_chord
+	
+def recursive_line_transpose(source_line, source_chords, direction, to_key, chord_style_out='abc'):
 	if not source_chords or not source_line:
 		return source_line
 	source_chord = source_chords.pop(0)
 	chord_index = source_line.find(source_chord)
 	after_chord_index = chord_index + len(source_chord)
-	
 	return source_line[:chord_index] + \
-		   transpose(source_chord, direction, to_key) + \
-		   recursive_line_transpose(source_line[after_chord_index:], source_chords, direction, to_key)
+		   transpose(source_chord, direction, to_key, chord_style_out) + \
+		   recursive_line_transpose(source_line[after_chord_index:], source_chords, direction, to_key, chord_style_out)
 
 
-def transpose(source_chord, direction, to_key):
+def transpose(source_chord, direction, to_key, chord_style_out='abc'):
 	"""Transposes a chord a number of half tones.
 	Sharp or flat depends on target key.
 	>>> transpose('C', 3, 'Bb')
 	'Eb'
 	"""
 	source_index = get_index_from_key(source_chord)
-	return get_key_from_index(source_index + direction, to_key)
+	k = get_key_from_index(source_index + direction, to_key)
+	if chord_style_out == 'abc':
+		return k
+	elif chord_style_out == 'doremi':
+		return chord_abc_to_doremi(k)
+	raise Exception("Invalid output chord style: %s" % chord_style_out)
+
+def chord_abc_to_doremi(x):
+	sharp_flat = re.findall(r'[b\#]', x)
+	clean_chord = re.sub(r'[b\#]','', x)
+	translated_chord = abc_to_doremi_dictionary[clean_chord]
+	for sf in sharp_flat:
+		translated_chord += sf
+	return translated_chord
+
+def is_abc(chord):
+	return chord in abc_to_doremi_dictionary
+
+def is_doremi(chord):
+	return chord in doremi_to_abc_dictionary
 
 
 def usage():
-	print 'Usage:'
-	print '%s --from=Eb --to=F# input_filename' % os.path.basename(__file__)
+	print('Usage:')
+	print('%s --from=Eb --to=F# --style-in=abc --style-out=doremi input_filename' % os.path.basename(__file__))
 	sys.exit(2)
 
 def main():
 	from_key = 'C'
 	to_key = 'C'
+	chord_style_in = 'abc'
+	chord_style_out = 'abc'
 	file_name = None
 	try:
-		options, arguments = getopt.getopt(sys.argv[1:], 'f:t:', ['from=', 'to=', 'doctest'])
-	except getopt.GetoptError, err:
-		print str(err)
+		options, arguments = getopt.getopt(sys.argv[1:], 'f:t:', ['from=', 'to=', 'style-in=', 'style-out=', 'doctest'])
+	except getopt.GetoptError as err:
+		print(str(err))
 		usage()
-		sys.exit(2)
 	for option, value in options:
 		if option in ('-f', '--from'):
 			from_key = value
+			if is_doremi(from_key):
+				from_key = chord_doremi_to_abc(from_key)
 		elif option in ('-t', '--to'):
 			to_key = value
+			if is_doremi(to_key):
+				to_key = chord_doremi_to_abc(to_key)
+		elif option in ('-i', '--style-in'):
+			chord_style_in = value
+		elif option in ('-o', '--style-out'):
+			chord_style_out = value
 		elif option == '--doctest':
 			import doctest
 			doctest.testmod()
@@ -161,9 +216,23 @@ def main():
 	else:
 		usage()
 	
-	result = transpose_file(file_name, from_key, to_key)
+	result = transpose_file(file_name, from_key, to_key, chord_style_in, chord_style_out)
+
+	if chord_style_in == 'abc':
+		from_key_ = from_key
+	elif chord_style_in == 'doremi':
+		from_key_ = chord_abc_to_doremi(from_key)
+	else:
+		raise Exception("Invalid input chord style: %s" % chord_style_in)
+
+	if chord_style_out == 'abc':
+		to_key_ = to_key
+	elif chord_style_out == 'doremi':
+		to_key_ = chord_abc_to_doremi(to_key)
+	else:
+		raise Exception("Invalid output chord style: %s" % chord_style_out)
 	
-	print("Result (%s -> %s):" % (from_key, to_key))
+	print("Result (%s -> %s):" % (from_key_, to_key_))
 	print(result)
 	
 if __name__ == '__main__':
