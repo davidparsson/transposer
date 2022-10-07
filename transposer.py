@@ -177,7 +177,7 @@ def is_doremi(chord):
 
 def usage():
 	print('Usage:')
-	print('%s --from=Eb --to=F# --style-in=abc --style-out=doremi input_filename' % os.path.basename(__file__))
+	print('python3 %s --from=Eb --to=F# --style-in=abc --style-out=doremi input_filename' % os.path.basename(__file__))
 	sys.exit(2)
 
 def main():
@@ -232,7 +232,7 @@ def main():
 	else:
 		raise Exception("Invalid output chord style: %s" % chord_style_out)
 	
-	print("Result (%s -> %s):" % (from_key_, to_key_))
+	print("Finished transposing from '%s' to '%s':" % (from_key_, to_key_))
 	print(result)
 	
 if __name__ == '__main__':
